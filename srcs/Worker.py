@@ -1,52 +1,52 @@
 import threading
 from concurrent.futures import ThreadPoolExecutor
 
-
 class Worker:
     lock = threading.Lock()
 
-    def __init__(self, scraper, url, depth_level):
+    def __init__(self, depth_level):
         super().__init__()
-        self.scraper = scraper
-        self.url = url
         self.depth_level = depth_level
-        self.threads = []
-        self.executor = ThreadPoolExecutor(max_workers=1)
+        self.workers = []
+        self.all_links = []
 
-    def run(self):
+    def run(self, url, scraper):
         try:
             if self.depth_level < 0:
                 return
 
-            with Worker.lock:
-                if self.url in self.scraper.links_visited:
+            with scraper.lock:
+                if url in scraper.links_visited:
+                    print(f"URL already visited: {url}")
                     return
-                self.scraper.links_visited.add(self.url)
-                self.scraper.url = self.url
+                scraper.url = url
+                self.all_links = []
 
-            page_content = self.scraper._fetch_html_page()
-
+            page_content = scraper._fetch_html_page(url)
             if page_content is None:
                 return
 
-            self.scraper._parse_html_page(page_content)
-            self.scraper.create_directory(self.scraper.path)
+            scraper._parse_html_page(page_content, self)
 
-            print(f"{len(self.scraper.all_images)} images to download.")
-            self.scraper.download_images()
+            # scraper.download_images()
 
-            if self.scraper.recurse and self.depth_level > 0:
+            if self.depth_level > 0:
                 self.depth_level -= 1
-                for link in self.scraper.all_links:
-                    worker = Worker(self.scraper, link, self.depth_level)
-                    fut = self.executor.submit(worker.run)
-                    self.threads.append(fut)
+                for link in self.all_links:
+                    
+                    worker = Worker(self.depth_level)
+                    
+                    with scraper.lock:
+                        fut = scraper.executor.submit(worker.run, link, scraper)
+                    
+                    self.workers.append(fut)
 
         except Exception as e:
-            print(f"Error in worker for URL {self.url}: {e}")
+            pass
+            # print(f"Error in worker for URL {self.url}: {e}")
 
         finally:
-            for fut in self.threads:
+            for fut in self.workers:
                 try:
                     fut.result()
                 except Exception as e:
