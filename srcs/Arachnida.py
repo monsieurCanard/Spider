@@ -28,7 +28,6 @@ class Arachnida:
         self.all_images = set()
 
         self.links_visited = set()
-        self.downloaded_images = []
         self.all_image_names = set()
 
         self.executor = ThreadPoolExecutor(max_workers=20)
@@ -73,6 +72,7 @@ class Arachnida:
             for img in all_images:
                 url_dest = urljoin(self.url, img)
                 image_name = os.path.basename(urlparse(url_dest).path)
+
                 if image_name not in self.all_image_names:
                     self.all_images.add(url_dest)
                     self.all_image_names.add(image_name)
