@@ -1,6 +1,7 @@
 import tqdm
 from Arachnida import Arachnida
 import requests
+from concurrent.futures import as_completed
 from Worker import Worker
 import os
 
@@ -60,31 +61,35 @@ def main():
 
     print_launch_banner(scraper)
 
-    try:
-        page_content = scraper._fetch_html_page(scraper.url)
-    except requests.RequestException as e:
-        print(f"Error fetching the page: {e}")
-        return
-
+    page_content = scraper._fetch_html_page(scraper.url, main=True)
     if page_content is None:
         return
 
     scraper._parse_html_page(page_content)
     scraper.create_directory(scraper.path)
 
-    previous_size_data = get_dir_size(
-        scraper.path,
-    )
+    previous_size_data = get_dir_size(scraper.path, scraper)
 
     if scraper.recurse and scraper.level > 0:
-        scraper.level -= 1
         for link in scraper.all_links:
             worker = Worker(scraper.level)
             fut = scraper.executor.submit(worker.run, link, scraper)
             scraper.threads.append(fut)
 
-    for thread in scraper.threads:
-        thread.result()
+        while True:
+            with scraper.lock:
+                pending = [f for f in scraper.threads if not f.done()]
+            if not pending:
+                break
+            for fut in tqdm.tqdm(
+                as_completed(pending),
+                total=len(pending),
+                desc="Scrapping links",
+            ):
+                try:
+                    fut.result()
+                except Exception as e:
+                    print(f"Worker error while scrapping link: {e}")
 
     print(f"Total images to download: {len(scraper.all_images)} images.")
     print("Do you want to download the images? (y/n): ", end="")
@@ -92,26 +97,34 @@ def main():
     choice = input().strip().lower()
     if choice == "y":
         print("\nStarting image download...\n")
+
+        download_fut = []
         for image in scraper.all_images:
             worker = Worker(scraper.level)
             fut = scraper.executor.submit(worker.download_images, scraper, image)
-            scraper.threads.append(fut)
+            download_fut.append(fut)
 
-        for thread in tqdm.tqdm(scraper.threads, desc="Downloading images"):
-            thread.result()
-
+        for fut in tqdm.tqdm(
+            as_completed(download_fut),
+            total=len(download_fut),
+            desc="Downloading images",
+        ):
+            try:
+                fut.result()
+            except Exception as e:
+                print(f"Worker error while downloading image: {e}")
         total_download_Size = get_dir_size(scraper.path, scraper)
 
         print(f"Scrapper path: {scraper.path}\n")
         print(f"""
 -----------------------------------
-        Download complete
+    Download complete
 -----------------------------------
- ++ {scraper.download} downloaded ( ~ {(total_download_Size - previous_size_data) / (1024**2):.2f} MB)
+++ {scraper.download} downloaded ( ~ {(total_download_Size - previous_size_data) / (1024**2):.2f} MB)
 -----------------------------------      
- -- {scraper.duplicates} duplicates
+-- {scraper.duplicates} duplicates
 -----------------------------------      
- -- {scraper.error} errors.
+-- {scraper.error} errors.
 -----------------------------------
         """)
 

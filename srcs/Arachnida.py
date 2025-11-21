@@ -30,7 +30,7 @@ class Arachnida:
         self.links_visited = set()
         self.all_image_names = set()
 
-        self.executor = ThreadPoolExecutor(max_workers=20)
+        self.executor = ThreadPoolExecutor()
         self.parser.parse_args(self)
 
     def __str__(self):
@@ -38,26 +38,35 @@ class Arachnida:
         links = "\n".join(str(link) for link in self.all_links)
         return f"Images:\n{images}\n\nLinks:\n{links}"
 
-    def _fetch_html_page(self, url):
+    def _fetch_html_page(self, url, main=False):
         try:
             with self.lock:
                 if url in self.links_visited:
                     return None
                 self.links_visited.add(url)
-                response = requests.get(
-                    url,
-                    headers={
-                        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:140.0) Gecko/20100101 Firefox/140.0",
-                        "Connection": "keep-alive",
-                    },
-                    timeout=5,
-                )
+
+            # self.links_visited.add(url)
+            response = requests.get(
+                url,
+                headers={
+                    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:140.0) Gecko/20100101 Firefox/140.0",
+                    "Connection": "keep-alive",
+                },
+                timeout=5,
+            )
+
             response.raise_for_status()
+
+            if "text/html" not in response.headers.get("Content-Type"):
+                return None
+
             return response
 
-        except requests.exceptions.RequestException as e:
-            # print("An error occurred during the request: ", e)
-            # TODO: Handle different http response code
+        except requests.RequestException as e:
+            if main:
+                print("ERROR SPIDER")
+                print("------------------")
+                print(f"Request error while fetching {url}: {e}")
             return None
 
     def _parse_html_page(self, response, worker=None):
@@ -71,19 +80,24 @@ class Arachnida:
         with self.lock:
             for img in all_images:
                 url_dest = urljoin(self.url, img)
-                image_name = os.path.basename(urlparse(url_dest).path)
-
-                if image_name not in self.all_image_names:
+                if url_dest not in self.all_images:
                     self.all_images.add(url_dest)
-                    self.all_image_names.add(image_name)
+
+            new_links = []
+            for link in all_links:
+                full_url = urljoin(response.url, link)
+                if full_url not in self.links_visited:
+                    new_links.append(full_url)
 
             if worker is None:
                 self.all_links = self.parser._parse_url_path(
-                    self, all_links, images=False
+                    self,
+                    new_links,
+                    images=False,
                 )
             else:
                 worker.all_links = self.parser._parse_url_path(
-                    self, all_links, images=False
+                    self, new_links, images=False
                 )
 
     def create_directory(self, path):
