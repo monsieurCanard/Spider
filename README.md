@@ -23,7 +23,7 @@ Arachnida est un petit scraper web (en Python) conçu pour parcourir un site web
 Prerequis : Python 3.8+ recommandé. Installer les dépendances (requests, tqdm).
 
 ```bash
-python3 -m pip install -r requirements.txt || python3 -m pip install requests tqdm
+python3 -m pip install -r requirements.txt
 ```
 
 Si vous préférez ne pas utiliser `requirements.txt`, installez manuellement :
