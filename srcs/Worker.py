@@ -26,7 +26,6 @@ class Worker:
                 return
 
             scraper._parse_html_page(page_content, self)
-
             self.depth_level -= 1
             for link in self.all_links:
                 worker = Worker(self.depth_level)
@@ -34,7 +33,7 @@ class Worker:
                 with scraper.lock:
                     scraper.threads.append(fut)
         except Exception as e:
-            pass
+            scraper.logger.error(f"Worker error while worker running link {url}: {e}")
 
     def download_images(self, scraper, imageUrl):
         try:
@@ -50,6 +49,7 @@ class Worker:
                 dest_path = os.path.abspath(url)
                 if os.path.exists(dest_path) and os.path.getsize(dest_path) > 0:
                     scraper.duplicates += 1
+                    scraper.logger.info(f"Duplicate image found, skipping download: {dest_path}")
                     return
 
             response = requests.get(
@@ -64,10 +64,12 @@ class Worker:
             )
             response.raise_for_status()
 
+            scraper.logger.info(f"Downloading image: {imageUrl}")
             with open(dest_path, "wb") as f:
                 for chunk in response.iter_content(chunk_size=8192):
                     if chunk:
                         f.write(chunk)
+            
             with scraper.lock:
                 if os.path.exists(dest_path) and os.path.getsize(dest_path) > 0:
                     scraper.total_download_size += os.path.getsize(dest_path)
@@ -76,5 +78,4 @@ class Worker:
         except Exception as e:
             with scraper.lock:
                 scraper.error += 1
-
-            # print(f"Error downloading image {imageUrl}: {e}")
+            scraper.logger.error(f"Error downloading image {imageUrl}: {e}")

@@ -33,14 +33,21 @@ class Parser(HTMLParser):
         self.arg_parser.add_argument(
             "-p", "--path", type=str, help="Directory to save images"
         )
+        
+        self.arg_parser.add_argument(
+            "--log",
+            type=str,
+            help="Set the logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)",
+        )
 
     def parse_args(self, scraper):
         args = self.arg_parser.parse_args()
 
         scraper.url = args.url
         scraper.recurse = args.recurse
-        scraper.level = args.level if args.level else 0
+        scraper.level = args.level if args.level else 5
         scraper.path = args.path if args.path else "data"
+        scraper.log_level = args.log.upper() if args.log else None
 
         # Ensure the URL has a scheme
         url_parsed = urlparse(scraper.url)

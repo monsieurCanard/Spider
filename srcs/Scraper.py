@@ -1,13 +1,14 @@
 import os
 import requests
 import threading
-from urllib.parse import urljoin, urlparse
+from urllib.parse import urljoin
 from Parser import Parser
 from concurrent.futures import ThreadPoolExecutor
-from tqdm import tqdm
+
+from Logger import get_logger
 
 
-class Arachnida:
+class Scraper:
     def __init__(self):
         self.lock = threading.Lock()
 
@@ -17,6 +18,8 @@ class Arachnida:
 
         self.recurse = False
         self.level = 5
+        self.log_level = None
+        self.path = "data"
 
         self.total = 0
         self.duplicates = 0
@@ -32,6 +35,12 @@ class Arachnida:
 
         self.executor = ThreadPoolExecutor()
         self.parser.parse_args(self)
+        self.logger = get_logger()
+        self.logger = get_logger()
+        if self.log_level is None:
+            self.logger.setLevel(100)
+        else:
+            self.logger.setLevel(self.log_level)
 
     def __str__(self):
         images = "\n".join(str(img) for img in self.all_images)
@@ -39,9 +48,11 @@ class Arachnida:
         return f"Images:\n{images}\n\nLinks:\n{links}"
 
     def _fetch_html_page(self, url, main=False):
+        self.logger.info(f"Fetching URL: {url}")
         try:
             with self.lock:
                 if url in self.links_visited:
+                    self.logger.info(f"URL already visited: {url}")
                     return None
                 self.links_visited.add(url)
 
@@ -58,15 +69,13 @@ class Arachnida:
             response.raise_for_status()
 
             if "text/html" not in response.headers.get("Content-Type"):
+                self.logger.info(f"URL is not an HTML page: {url}")
                 return None
 
             return response
 
         except requests.RequestException as e:
-            if main:
-                print("ERROR SPIDER")
-                print("------------------")
-                print(f"Request error while fetching {url}: {e}")
+            self.logger.error(f"Error fetching URL {url}: {e}")
             return None
 
     def _parse_html_page(self, response, worker=None):
@@ -76,7 +85,7 @@ class Arachnida:
 
         all_images = parser.images
         all_links = parser.links
-
+        self.logger.info(f"Found {len(all_images)} images and {len(all_links)} links on the page.")
         with self.lock:
             for img in all_images:
                 url_dest = urljoin(self.url, img)
@@ -103,3 +112,4 @@ class Arachnida:
     def create_directory(self, path):
         if not os.path.exists(path):
             os.makedirs(path)
+        self.logger.info(f"Directory created or already exists: {path}")
