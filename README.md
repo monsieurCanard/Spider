@@ -349,7 +349,6 @@ dist/Spider https://example.com --log WARNING
 
 | ⚠️ | Considération |
 |:---:|:---|
-| 🤖 | Respectez le fichier `robots.txt` des sites web |
 | ⏱️ | Évitez de surcharger les serveurs avec trop de requêtes |
 | 📜 | Vérifiez les conditions d'utilisation des sites cibles |
 | 🔒 | Certains sites peuvent bloquer les scrapers |
@@ -373,8 +372,6 @@ dist/Spider https://example.com --log WARNING
 </p>
 
 **Si ce projet vous a été utile, n'hésitez pas à lui donner une ⭐ !**
-
-[⬆ Retour en haut](#-arachnida)
 
 </div>
 
