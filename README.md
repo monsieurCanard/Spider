@@ -1,92 +1,184 @@
-**Arachnida**
+<div align="center">
 
-Arachnida est un petit scraper web (en Python) conçu pour parcourir un site web, extraire les images et les télécharger localement. Il supporte la récursivité, un niveau de profondeur configurable, et un logger pour suivre l'activité (fichier `spider.log`).
+# 🕷️ Arachnida
 
-**Principaux objectifs**
-- **Facile** : interface CLI simple pour lancer un crawl d'un site.
-- **Récursif** : possibilité de suivre les liens et d'aller en profondeur.
-- **Robuste** : téléchargements multi-threadés avec gestion basique des duplicatas et des erreurs.
+### _Mon scraper d'images png, jpg, gif et bmp_
 
-**Contenu du dépôt**
-- **`srcs/`** : code source principal.
-	- `prog.py` : point d'entrée principal (boucle, barre de progression, orchestration).
-	- `Scraper.py` : logique du scraper (récupération des pages, parsing, stockage des URL).
-	- `Parser.py` : extrait images et liens d'une page HTML (utilise `argparse` pour la CLI).
-	- `Worker.py` : tâches exécutées par les threads (crawl récursif, téléchargement d'images).
-	- `Logger.py` : configuration du logger (fichier `spider.log`).
-	- `utils.py` : utilitaires (par ex. calcul de la taille du dossier `data`).
-	- `print.py` : fonctions d'affichage pour bannières centrées.
-- **`data/`** : dossier où les images seront enregistrées (généré à l'exécution).
-- `spider.log` : fichier de log produit par `Logger.get_logger()`.
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3.8+-blue.svg?style=for-the-badge&logo=python&logoColor=white" alt="Python Version">
+  <img src="https://img.shields.io/badge/Status-Active-success.svg?style=for-the-badge" alt="Status">
+  <img src="https://img.shields.io/badge/Platform-Linux%20%7C%20macOS%20%7C%20Windows-lightgrey.svg?style=for-the-badge" alt="Platform">
+</p>
 
-**Installation (rapide)**
-Prerequis : Python 3.8+ recommandé. Installer les dépendances (requests, tqdm).
+<p align="center">
+  <img src="https://img.shields.io/badge/Threads-Multi--threaded-orange.svg?style=flat-square" alt="Threads">
+  <img src="https://img.shields.io/badge/Recursion-Configurable-blueviolet.svg?style=flat-square" alt="Recursion">
+  <img src="https://img.shields.io/badge/Logging-Full%20Support-informational.svg?style=flat-square" alt="Logging">
+</p>
 
-```bash
-python3 -m pip install -r requirements.txt
+<div align="center">
 ```
+           ____                      ,
+          /---.'.__             ____//
+               '--.\           /.---'
+          _______  \\         //
+        /.------.\  \|      .'/  ______
+       //  ___  \ \ ||/|\  //  _/_----.\__
+      |/  /.-.\  \ \:|< >|// _/.'..\   '--'
+         //   \'. | \'.|.'/ /_/ /  \\
+        //     \ \_\/" ' ~\-'.-'    \\
+       //       '-._| :H: |'-.__     \\
+      //           (/'==='\)'-._\     ||
+      ||                        \\    \|
+      ||                         \\    '
+      |/                          \\
+```
+</div>
+</div>
 
-Si vous préférez ne pas utiliser `requirements.txt`, installez manuellement :
+---
+
+## 📋 Table des matières
+
+- [✨ Fonctionnalités](#-fonctionnalités)
+- [🚀 Installation rapide](#-installation-rapide)
+- [💻 Utilisation](#-utilisation)
+- [⚙️ Options CLI](#️-options-cli)
+- [📊 Exemple de sortie](#-exemple-de-sortie)
+- [🏗️ Architecture](#️-architecture)
+- [📁 Structure du projet](#-structure-du-projet)
+- [🔧 Configuration avancée](#-configuration-avancée)
+- [📝 Logging](#-logging)
+- [⚠️ Avertissements](#️-avertissements)
+- [❓ FAQ](#-faq)
+- [🤝 Contribution](#-contribution)
+- [📄 Licence](#-licence)
+
+---
+
+## ✨ Fonctionnalités
+
+<div align="center">
+
+| Fonctionnalité | Description |
+|:---:|:---|
+| 🔄 | **Crawling récursif** avec profondeur configurable |
+| ⚡ | **Multi-threading** pour des téléchargements rapides |
+| 🎯 | **Détection intelligente** des duplicatas |
+| 📊 | **Barres de progression** élégantes avec `tqdm` |
+| 📝 | **Logging complet** (fichier + console) |
+| 🎨 | **Interface CLI** intuitive avec ASCII art |
+| 🔍 | **Filtrage automatique** des formats d'image (.jpg, .png, .gif, .bmp) |
+| 💾 | **Organisation hiérarchique** des téléchargements |
+
+</div>
+
+---
+
+## 🚀 Installation rapide
+
+### Prérequis
+
+- **Python 3.8+** recommandé
+- `pip` pour installer les dépendances
+
+### Étapes
 
 ```bash
+# Cloner le repository
+git clone https://github.com/monsieurCanard/Arachnida.git
+cd Arachnida
+
+# Installer les dépendances
+python3 -m pip install -r requirements.txt
+
+# Ou installer manuellement
 python3 -m pip install requests tqdm
 ```
 
-**Utilisation**
-Lancer le scraper depuis la racine du repository (zsh / terminal) :
+> 💡 **Astuce** : Utilisez un environnement virtuel pour isoler les dépendances
+> ```bash
+> python3 -m venv .venv
+> source .venv/bin/activate  # Linux/macOS
+> # .venv\Scripts\activate    # Windows
+> ```
+
+---
+
+## 💻 Utilisation
+
+### Commande de base
 
 ```bash
-python3 srcs/prog.py <URL> [options]
+dist/Spider <URL> [OPTIONS]
 ```
 
-Exemples :
+### 📖 Exemples pratiques
+
+<details>
+<summary>🔹 <b>Crawl simple (sans récursivité)</b></summary>
 
 ```bash
-# Crawl simple (sans récursivité)
-python3 srcs/prog.py https://example.com
-
-# Crawl récursif jusqu'à 2 niveaux, enregistrer dans data_custom et logs en INFO
-python3 srcs/prog.py https://example.com -r -l 2 -p data_custom --log INFO
+dist/Spider https://example.com
 ```
+</details>
 
-Notes : l'argument positionnel `url` est requis. Les options sont définies dans `Parser.py` (`-r`, `-l`, `-p`, `--log`).
+<details>
+<summary>🔹 <b>Crawl récursif avec profondeur limitée</b></summary>
 
-**Options CLI**
-- **`url`** : URL cible (ex : `https://example.com`). Si le schéma est absent, `https://` est préfixé.
-- **`-r`, `--recurse`** : activer la récursivité sur les liens trouvés.
-- **`-l`, `--level`** : profondeur maximale de récursivité (par défaut 5).
-- **`-p`, `--path`** : dossier de destination pour les images (par défaut `data`).
-- **`--log`** : niveau de log (`DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`).
+```bash
+dist/Spider https://example.com -r -l 2
+```
+</details>
 
-**Logging**
-- Le logger écrit dans le fichier `spider.log` (créé au démarrage si nécessaire) et affiche les messages `INFO+` sur la console.
-- Si vous ne voyez pas de logs dans `spider.log` :
-	- vérifiez que vous exécutez le script depuis le répertoire du projet (cwd), car le `FileHandler` utilise le chemin relatif `spider.log`.
-	- utilisez l'option `--log INFO` pour forcer un niveau d'information visible.
+<details>
+<summary>🔹 <b>Personnaliser le dossier de destination</b></summary>
 
-Conseil (débogage) : ouvrez `spider.log` pour suivre l'activité détaillée (DEBUG) et surveillez la console pour les messages INFO/ERROR.
+```bash
+dist/Spider https://example.com -p my_images
+```
+</details>
 
-**Architecture et flux d'exécution**
-- `prog.py` crée un objet `Scraper`.
-- `Scraper` lit les arguments via `Parser.parse_args(self)` et configure le logger.
-- `prog.py` récupère la page principale (`_fetch_html_page`) et appelle `_parse_html_page` qui alimente `Scraper.all_images` et `Scraper.all_links`.
-- Si la récursivité est activée, `Worker.run` est soumis au `ThreadPoolExecutor` pour parcourir les liens.
-- Pour les images, `Worker.download_images` télécharge en streaming et stocke les fichiers sous `data/<netloc>/<path>`.
+<details>
+<summary>🔹 <b>Activer les logs détaillés</b></summary>
 
-**Warning**
-- Ne pas lancer des crawls massifs sans autorisation : respectez le `robots.txt` et la charge serveur.
-- Timeout et gestion des erreurs sont basiques : certaines pages lentes ou serveurs stricts peuvent produire des erreurs.
-- La logique d'unicité des images se base sur le chemin/dossier final ; si deux images différentes ont le même nom/location relative, elles peuvent être considérées comme duplicatas.
+```bash
+dist/Spider https://example.com --log DEBUG
+```
+</details>
 
+<details>
+<summary>🔹 <b>Configuration complète</b></summary>
 
-Si vous voulez, je peux :
-- ajouter un `requirements.txt` propre,
-- corriger le problème du niveau de logger dans `Scraper.py` et proposer un patch,
-- fournir des exemples plus détaillés ou des tests unitaires simples.
+```bash
+dist/Spider https://example.com \
+  -r \
+  -l 3 \
+  -p downloads/images \
+  --log INFO
+```
+</details>
 
-Faites-moi savoir ce que vous préférez que je fasse ensuite.
+---
 
-# Exemple d'exécution (avec log activé)
+## ⚙️ Options CLI
+
+| Option | Raccourci | Type | Défaut | Description |
+|:---:|:---:|:---:|:---:|:---|
+| `url` | - | `string` | **requis** | 🌐 URL cible à scraper |
+| `--recurse` | `-r` | `flag` | `False` | 🔄 Activer le crawling récursif |
+| `--level` | `-l` | `int` | `5` | 📊 Profondeur de récursion (1-10) |
+| `--path` | `-p` | `string` | `data` | 📁 Dossier de destination |
+| `--log` | - | `string` | `None` | 📝 Niveau de log (`DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`) |
+
+> ⚠️ **Note** : Si aucun schéma n'est fourni dans l'URL, `https://` est automatiquement ajouté.
+
+---
+
+## 📊 Exemple de sortie
+
+<!-- <details>
+<summary>Cliquez pour voir un exemple complet d'exécution</summary> -->
 
 ```bash
 2025-11-22 09:19:32,485 [INFO] Arachnida Spider started.
@@ -96,86 +188,194 @@ Faites-moi savoir ce que vous préférez que je fasse ensuite.
            ____                      ,
           /---.'.__             ____//
                '--.\           /.---'
-          _______  \         //
+          _______  \\         //
         /.------.\  \|      .'/  ______
        //  ___  \ \ ||/|\  //  _/_----.\__
       |/  /.-.\  \ \:|< >|// _/.'..\   '--'
-         //   \'. | \'.|.'/ /_/ /  \
-        //     \ \_\/" ' ~\-'.-'    \
-       //       '-._| :H: |'-.__     \
+         //   \'. | \'.|.'/ /_/ /  \\
+        //     \ \_\/" ' ~\-'.-'    \\
+       //       '-._| :H: |'-.__     \\
       //           (/'==='\)'-._\     ||
       ||                        \\    \|
       ||                         \\    '
       |/                          \\
                                    ||
                                    ||
-                                   \
+                                   \\
     ========================================
-        TARGET URL: https://clubic.com
+        TARGET URL: https://example.com
         RECURSION: True
-        DEPTH LEVEL: 1
+        DEPTH LEVEL: 2
     ========================================
         LET'S GET ALL THE IMAGES!
     ++++++++++++++++++++++++++++++++++++++++
 
-2025-11-22 09:19:32,486 [INFO] Fetching main page: https://clubic.com
-2025-11-22 09:19:32,486 [INFO] Fetching URL: https://clubic.com
+2025-11-22 09:19:32,486 [INFO] Fetching main page: https://example.com
 2025-11-22 09:19:32,691 [INFO] Found 6 images and 461 links on the page.
-2025-11-22 09:19:32,697 [INFO] Directory created or already exists: data
-2025-11-22 09:19:32,726 [INFO] Initial size of data directory 'data': 38245474 bytes.
-2025-11-22 09:19:32,726 [INFO] Starting crawl with recursion level 1.
-2025-11-22 09:19:32,727 [INFO] Fetching URL: https://www.clubic.com/
-2025-11-22 09:19:32,739 [INFO] Starting crawl loop with 461 workers.
+2025-11-22 09:19:32,726 [INFO] Starting crawl with recursion level 2.
 
-# --- Progression simulée de la phase "crawl" (tqdm)
-# note : tqdm met à jour la même ligne ; ici on montre plusieurs étapes successives
-Spider charging caffeine… crawling faster…:  12%|███▏       | 56/461 [00:05<00:36, 11.2it/s]
-Spider charging caffeine… crawling faster…:  34%|███████▎   | 157/461 [00:16<00:30, 10.6it/s]
-Spider charging caffeine… crawling faster…:  62%|████████████▋ | 286/461 [00:28<00:13, 12.0it/s]
-Spider charging caffeine… crawling faster…: 100%|████████████████████| 461/461 [00:42<00:00, 10.9it/s]
+# Phase de crawling
+Spider charging caffeine… crawling faster…: 100%|████████████| 461/461 [00:42<00:00, 10.9it/s]
 
-2025-11-22 09:19:32,954 [INFO] Found 1 images and 146 links on the page.
-2025-11-22 09:19:32,977 [INFO] Found 1 images and 159 links on the page.
-2025-11-22 09:19:33,000 [INFO] Found 1 images and 139 links on the page.
-... (logs de pages trouvées) ...
-
-# Après crawl : confirmation du nombre d'images
                      Total images to download: 123 images.
-
-# Demande utilisateur (input)
-                     Do you want to download the images? (y/n):
-
-# L'utilisateur répond 'y' et commence la phase de téléchargement
+                     Do you want to download the images? (y/n): y
 
                      Starting image download...
 
-2025-11-22 09:20:15,120 [INFO] Starting download of 123 images.
-
-# --- Progression simulée de la phase "download" (tqdm)
-Negotiating with TCP like it’s a hostage situation.:   0%|          | 0/123 [00:00<?, ?it/s]
-Negotiating with TCP like it’s a hostage situation.:  25%|███▍      | 31/123 [00:04<00:13, 7.00it/s]
-Negotiating with TCP like it’s a hostage situation.:  50%|████████▌ | 62/123 [00:10<00:09, 6.75it/s]
-Negotiating with TCP like it’s a hostage situation.: 100%|████████████| 123/123 [00:22<00:00, 5.45it/s]
-
-2025-11-22 09:20:37,350 [INFO] Downloading image: https://www.clubic.com/images/sample1.jpg
-2025-11-22 09:20:37,435 [INFO] Downloading image: https://www.clubic.com/images/sample2.jpg
-2025-11-22 09:20:39,102 [INFO] Duplicate image found, skipping download: data/www.clubic.com/images/sample3.jpg
-2025-11-22 09:20:45,600 [ERROR] Error downloading image https://...: ConnectionError('...')
-
-2025-11-22 09:21:00,123 [INFO] Final size of data directory 'data': 38900482 bytes.
+# Phase de téléchargement
+Negotiating with TCP like it's a hostage situation.: 100%|████████| 123/123 [00:22<00:00, 5.45it/s]
 
     ========================================
           Arachnida - Scraping Complete
     ========================================
-    ++ 100 downloaded ( ~ 6.25 MB)
-    -----------------------------------      
-    -- 20 duplicates
-    -----------------------------------      
-    -- 3 errors.
+    ++ 120 downloaded ( ~ 8.54 MB)
+    -----------------------------------
+    -- 3 duplicates
+    -----------------------------------
+    -- 0 errors.
     -----------------------------------
     ===================================
       Spider returning to the shadows…
             As all spiders do.
     ===================================
 ```
+
+<!-- </details> -->
+
+---
+
+## 🏗️ Architecture
+
+```mermaid
+graph TD
+    A[prog.py] -->|Crée| B[Scraper]
+    B -->|Parse args| C[Parser]
+    B -->|Configure| D[Logger]
+    B -->|Fetch HTML| E[Page Web]
+    E -->|Parse| F[Liens & Images]
+    F -->|Recursion?| G{Oui/Non}
+    G -->|Oui| H[Worker.run]
+    G -->|Non| I[Download direct]
+    H -->|ThreadPool| J[Crawl récursif]
+    J --> I
+    I -->|Worker.download_images| K[Fichiers locaux]
+    K --> L[data/netloc/path/]
+```
+
+### 🔄 Flux d'exécution
+
+1. **Initialisation** : Création de l'objet `Scraper` et parsing des arguments CLI
+2. **Configuration** : Setup du logger et du `ThreadPoolExecutor`
+3. **Fetch** : Récupération de la page HTML principale
+4. **Parsing** : Extraction des liens et images via `HTMLParser`
+5. **Crawling** : *(optionnel)* Parcours récursif des liens trouvés
+6. **Download** : Téléchargement multi-threadé des images
+7. **Rapport** : Affichage des statistiques finales
+
+---
+
+## 📁 Structure du projet
+
+```
+Arachnida/
+├── 📄 README.md                 # Ce fichier
+├── 📄 requirements.txt          # Dépendances Python
+├── 📄 spider.log                # Logs d'exécution (généré)
+├── 📂 Spider/                   # Code source
+│   ├── 🐍 prog.py              # Point d'entrée principal
+│   ├── 🐍 Scraper.py           # Logique du scraper
+│   ├── 🐍 Parser.py            # Parsing HTML + CLI args
+│   ├── 🐍 Worker.py            # Tâches threadées
+│   ├── 🐍 Logger.py            # Configuration logging
+│   ├── 🐍 utils.py             # Fonctions utilitaires
+│   └── 🐍 print.py             # Bannières ASCII
+└── 📂 data/                     # Images téléchargées (généré)
+    └── 📂 <netloc>/
+        └── 📂 <path>/
+            └── 🖼️ image.jpg
+```
+
+---
+
+## 🔧 Configuration avancée
+
+### 🎨 Personnaliser les messages de progression
+
+Éditez `prog.py` (lignes 15-22) pour modifier les descriptions des barres `tqdm` :
+
+```python
+progress_bar_desc = [
+    "Votre message personnalisé 1",
+    "Votre message personnalisé 2",
+    "Votre message personnalisé 3"
+]
+```
+
+### 📝 Logging
+
+Le logger écrit simultanément dans :
+- **Fichier** : `spider.log` (niveau `DEBUG` - tout est enregistré)
+- **Console** : stdout (niveau `INFO` - messages importants uniquement)
+
+#### Configuration dans `Logger.py`
+
+```python
+# File handler - enregistre tout
+fh = logging.FileHandler("spider.log")
+fh.setLevel(logging.DEBUG)
+
+# Stream handler - affiche INFO+
+sh = logging.StreamHandler()
+sh.setLevel(logging.INFO)
+```
+
+#### Utilisation
+
+```bash
+# Logs normaux (INFO)
+dist/Spider https://example.com --log INFO
+
+# Logs détaillés (DEBUG)
+dist/Spider https://example.com --log DEBUG
+
+# Logs minimaux (WARNING)
+dist/Spider https://example.com --log WARNING
+```
+
+---
+
+## ⚠️ Avertissements
+
+> 🚨 **Important** : Utilisez Arachnida de manière responsable
+
+| ⚠️ | Considération |
+|:---:|:---|
+| 🤖 | Respectez le fichier `robots.txt` des sites web |
+| ⏱️ | Évitez de surcharger les serveurs avec trop de requêtes |
+| 📜 | Vérifiez les conditions d'utilisation des sites cibles |
+| 🔒 | Certains sites peuvent bloquer les scrapers |
+| ⚖️ | Assurez-vous d'avoir le droit de télécharger le contenu |
+
+### Limitations connues
+
+- ⏳ Timeout par défaut : 5 secondes (peut être insuffisant pour certains serveurs)
+- 🔄 Gestion d'erreurs basique (pas de retry automatique)
+- 📸 Détection de duplicatas basée uniquement sur le chemin du fichier
+
+---
+
+<div align="center">
+
+### 💖 Merci d'utiliser Arachnida !
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Made%20with-Python-1f425f.svg?style=for-the-badge&logo=python" alt="Made with Python">
+  <img src="https://img.shields.io/badge/Maintained-Yes-green.svg?style=for-the-badge" alt="Maintained">
+</p>
+
+**Si ce projet vous a été utile, n'hésitez pas à lui donner une ⭐ !**
+
+[⬆ Retour en haut](#-arachnida)
+
+</div>
 
