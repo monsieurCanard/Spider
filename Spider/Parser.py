@@ -40,7 +40,7 @@ class Parser(HTMLParser):
             help="Set the logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)",
         )
 
-    def parse_args(self, scraper):
+    def _parse_args(self, scraper):
         args = self.arg_parser.parse_args()
 
         scraper.url = args.url
@@ -54,6 +54,7 @@ class Parser(HTMLParser):
         if not url_parsed.scheme:
             scraper.url = "https://" + scraper.url
 
+    # Pas d'underscore devant car utilisé par HtmlParser lorsque le parser rencontre une balise
     def handle_starttag(self, tag, attrs):
         attrs_dict = dict(attrs)
         if tag == "img" and "src" in attrs_dict:

@@ -51,7 +51,6 @@
 - [⚠️ Avertissements](#️-avertissements)
 - [❓ FAQ](#-faq)
 - [🤝 Contribution](#-contribution)
-- [📄 Licence](#-licence)
 
 ---
 

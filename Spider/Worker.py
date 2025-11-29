@@ -14,7 +14,7 @@ class Worker:
         self.workers = []
         self.all_links = []
 
-    def run(self, url, scraper):
+    def _run(self, url, scraper):
         try:
             if self.depth_level < 0:
                 return
@@ -29,13 +29,13 @@ class Worker:
             self.depth_level -= 1
             for link in self.all_links:
                 worker = Worker(self.depth_level)
-                fut = scraper.executor.submit(worker.run, link, scraper)
+                fut = scraper.executor.submit(worker._run, link, scraper)
                 with scraper.lock:
                     scraper.threads.append(fut)
         except Exception as e:
             scraper.logger.error(f"Worker error while worker running link {url}: {e}")
 
-    def download_images(self, scraper, imageUrl):
+    def _download_images(self, scraper, imageUrl):
         try:
             with scraper.lock:
                 url = (

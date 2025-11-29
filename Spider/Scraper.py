@@ -1,4 +1,3 @@
-import os
 import requests
 import threading
 from urllib.parse import urljoin
@@ -34,8 +33,7 @@ class Scraper:
         self.all_image_names = set()
 
         self.executor = ThreadPoolExecutor()
-        self.parser.parse_args(self)
-        self.logger = get_logger()
+        self.parser._parse_args(self)
         self.logger = get_logger()
         if self.log_level is None:
             self.logger.setLevel(100)
@@ -109,7 +107,3 @@ class Scraper:
                     self, new_links, images=False
                 )
 
-    def create_directory(self, path):
-        if not os.path.exists(path):
-            os.makedirs(path)
-        self.logger.info(f"Directory created or already exists: {path}")
