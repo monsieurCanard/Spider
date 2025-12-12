@@ -7,7 +7,6 @@ from loop import loop
 import sys
 
 
-
 def main():
     scraper = Scraper()
     scraper.logger.info("Arachnida Spider started.")
@@ -19,12 +18,6 @@ def main():
         return
 
     scraper._parse_html_page(page_content)
-    create_directory(scraper.logger, scraper.path)
-
-    previous_size_data = get_dir_size(scraper.path, scraper)
-    scraper.logger.info(
-        f"Initial size of data directory '{scraper.path}': {previous_size_data} bytes."
-    )
 
     if scraper.recurse and scraper.level > 0:
         scraper.logger.info(f"Starting crawl with recursion level {scraper.level}.")
@@ -35,6 +28,7 @@ def main():
     try:
         loop(scraper, scraper.threads, "crawl")
     except KeyboardInterrupt:
+        print_centered("\nCrawl interrupted... Please wait.")
         scraper.logger.info("Crawl interrupted by user.")
         scraper.executor.shutdown(wait=False, cancel_futures=True)
         sys.exit(0)
@@ -45,10 +39,16 @@ def main():
     choice = input().strip().lower()
     if choice == "n":
         return
+    create_directory(scraper.logger, scraper.path)
+    previous_size_data = get_dir_size(scraper.path, scraper)
+    scraper.logger.info(
+        f"Initial size of data directory '{scraper.path}': {previous_size_data} bytes."
+    )
     print_centered("\nStarting image download...\n")
 
     download_fut = []
     for imageUrl in scraper.all_images:
+        worker = Worker(0)
         fut = scraper.executor.submit(worker._download_images, scraper, imageUrl)
         download_fut.append(fut)
 
@@ -57,6 +57,7 @@ def main():
     try:
         loop(scraper, download_fut, "download")
     except KeyboardInterrupt:
+        print_centered("\nDownload interrupted... Please wait.")
         scraper.logger.info("Download interrupted by user.")
         scraper.executor.shutdown(wait=False, cancel_futures=True)
         sys.exit(0)

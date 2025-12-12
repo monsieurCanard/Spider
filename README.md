@@ -49,8 +49,6 @@
 - [🔧 Configuration avancée](#-configuration-avancée)
 - [📝 Logging](#-logging)
 - [⚠️ Avertissements](#️-avertissements)
-- [❓ FAQ](#-faq)
-- [🤝 Contribution](#-contribution)
 
 ---
 
@@ -88,15 +86,15 @@ git clone https://github.com/monsieurCanard/Arachnida.git
 cd Arachnida
 
 # Installer les dépendances
-python3 -m pip install -r requirements.txt
+python -m pip install -r requirements.txt
 
 # Ou installer manuellement
-python3 -m pip install requests tqdm
+python -m pip install requests tqdm
 ```
 
 > 💡 **Astuce** : Utilisez un environnement virtuel pour isoler les dépendances
 > ```bash
-> python3 -m venv .venv
+> python -m venv .venv
 > source .venv/bin/activate  # Linux/macOS
 > # .venv\Scripts\activate    # Windows
 > ```
@@ -108,7 +106,7 @@ python3 -m pip install requests tqdm
 ### Commande de base
 
 ```bash
-dist/Spider <URL> [OPTIONS]
+python prog.py <URL> [OPTIONS]
 ```
 
 ### 📖 Exemples pratiques
@@ -117,7 +115,7 @@ dist/Spider <URL> [OPTIONS]
 <summary>🔹 <b>Crawl simple (sans récursivité)</b></summary>
 
 ```bash
-dist/Spider https://example.com
+python prog.py https://example.com
 ```
 </details>
 
@@ -125,7 +123,7 @@ dist/Spider https://example.com
 <summary>🔹 <b>Crawl récursif avec profondeur limitée</b></summary>
 
 ```bash
-dist/Spider https://example.com -r -l 2
+python prog.py https://example.com -r -l 2
 ```
 </details>
 
@@ -133,7 +131,7 @@ dist/Spider https://example.com -r -l 2
 <summary>🔹 <b>Personnaliser le dossier de destination</b></summary>
 
 ```bash
-dist/Spider https://example.com -p my_images
+python prog.py https://example.com -p my_images
 ```
 </details>
 
@@ -141,7 +139,7 @@ dist/Spider https://example.com -p my_images
 <summary>🔹 <b>Activer les logs détaillés</b></summary>
 
 ```bash
-dist/Spider https://example.com --log DEBUG
+python prog.py https://example.com --log DEBUG
 ```
 </details>
 
@@ -149,7 +147,7 @@ dist/Spider https://example.com --log DEBUG
 <summary>🔹 <b>Configuration complète</b></summary>
 
 ```bash
-dist/Spider https://example.com \
+python prog.py https://example.com \
   -r \
   -l 3 \
   -p downloads/images \
@@ -278,15 +276,15 @@ graph TD
 Arachnida/
 ├── 📄 README.md                 # Ce fichier
 ├── 📄 requirements.txt          # Dépendances Python
-├── 📄 spider.log                # Logs d'exécution (généré)
-├── 📂 Spider/                   # Code source
-│   ├── 🐍 prog.py              # Point d'entrée principal
-│   ├── 🐍 Scraper.py           # Logique du scraper
-│   ├── 🐍 Parser.py            # Parsing HTML + CLI args
-│   ├── 🐍 Worker.py            # Tâches threadées
-│   ├── 🐍 Logger.py            # Configuration logging
-│   ├── 🐍 utils.py             # Fonctions utilitaires
-│   └── 🐍 print.py             # Bannières ASCII
+├── 📂 logs/
+│   ├── 📄 spider.log       # Fichier de logs
+├── 🐍 prog.py              # Point d'entrée principal
+├── 🐍 Scraper.py           # Logique du scraper
+├── 🐍 Parser.py            # Parsing HTML + CLI args
+├── 🐍 Worker.py            # Tâches threadées
+├── 🐍 Logger.py            # Configuration logging
+├── 🐍 utils.py             # Fonctions utilitaires
+└── 🐍 print.py             # Bannières ASCII
 └── 📂 data/                     # Images téléchargées (généré)
     └── 📂 <netloc>/
         └── 📂 <path>/
@@ -331,18 +329,18 @@ sh.setLevel(logging.INFO)
 
 ```bash
 # Logs normaux (INFO)
-dist/Spider https://example.com --log INFO
+python prog.py https://example.com --log INFO
 
 # Logs détaillés (DEBUG)
-dist/Spider https://example.com --log DEBUG
+python prog.py https://example.com --log DEBUG
 
 # Logs minimaux (WARNING)
-dist/Spider https://example.com --log WARNING
+python prog.py https://example.com --log WARNING
 ```
 
 ---
 
-## ⚠️ Avertissements
+### ⚠️ Avertissements
 
 > 🚨 **Important** : Utilisez Arachnida de manière responsable
 
@@ -361,16 +359,4 @@ dist/Spider https://example.com --log WARNING
 
 ---
 
-<div align="center">
-
-### 💖 Merci d'utiliser Arachnida !
-
-<p align="center">
-  <img src="https://img.shields.io/badge/Made%20with-Python-1f425f.svg?style=for-the-badge&logo=python" alt="Made with Python">
-  <img src="https://img.shields.io/badge/Maintained-Yes-green.svg?style=for-the-badge" alt="Maintained">
-</p>
-
-**Si ce projet vous a été utile, n'hésitez pas à lui donner une ⭐ !**
-
-</div>
 

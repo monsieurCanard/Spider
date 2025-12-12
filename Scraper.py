@@ -4,7 +4,7 @@ from urllib.parse import urljoin
 from Parser import Parser
 from concurrent.futures import ThreadPoolExecutor
 
-from Logger import get_logger
+from utils.Logger import get_logger
 
 
 class Scraper:
@@ -34,6 +34,7 @@ class Scraper:
 
         self.executor = ThreadPoolExecutor()
         self.parser._parse_args(self)
+        
         self.logger = get_logger()
         if self.log_level is None:
             self.logger.setLevel(100)
@@ -83,7 +84,9 @@ class Scraper:
 
         all_images = parser.images
         all_links = parser.links
-        self.logger.info(f"Found {len(all_images)} images and {len(all_links)} links on the page.")
+        self.logger.info(
+            f"Found {len(all_images)} images and {len(all_links)} links on the page."
+        )
         with self.lock:
             for img in all_images:
                 url_dest = urljoin(self.url, img)
@@ -106,4 +109,3 @@ class Scraper:
                 worker.all_links = self.parser._parse_url_path(
                     self, new_links, images=False
                 )
-
