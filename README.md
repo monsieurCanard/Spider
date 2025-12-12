@@ -16,7 +16,7 @@
 ```
 <div align="center">
 
-# 🕷️ Arachnida
+# 🕷️ Spider
 
 ### _Mon scraper d'images png, jpg, gif et bmp_
 
